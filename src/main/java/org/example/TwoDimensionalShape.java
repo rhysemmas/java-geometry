@@ -1,26 +1,26 @@
 package org.example;
 
-import java.util.ArrayList;
+public class TwoDimensionalShape {
+    public int[] startingCoordinates;
 
-abstract class TwoDimensionalShape {
-    public int[] startingCoordinate;
-
-    public abstract ArrayList<int[]> draw();
+    public void draw() {
+        System.out.println(this.startingCoordinates[0] + ", " + this.startingCoordinates[1]);
+    }
 
     public void moveLeft(int offset) {
-        startingCoordinate[0] -= offset;
+        this.startingCoordinates[0] -= offset;
     }
 
     public void moveRight(int offset) {
-        startingCoordinate[0] += offset;
+        this.startingCoordinates[0] += offset;
     }
 
     public void moveUp(int offset) {
-        startingCoordinate[1] += offset;
+        this.startingCoordinates[1] += offset;
     }
 
     public void moveDown(int offset) {
-        startingCoordinate[1] -= offset;
+        this.startingCoordinates[1] -= offset;
     }
 }
 

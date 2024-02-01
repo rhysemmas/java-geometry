@@ -10,10 +10,13 @@ import java.util.HashMap;
 // it feels weird having the thing that just handles input also be responsible for creating and managing the shapes.
 public class UserInputHandler {
     private final BufferedReader reader;
-    private HashMap<String, TwoDimensionalShape> shapes;
+    private final HashMap<String, TwoDimensionalShape> shapes;
+    private final HashMap<String, GroupedShape> groups;
 
     UserInputHandler() {
         this.reader = new BufferedReader(new InputStreamReader(System.in));
+        this.shapes = new HashMap<>();
+        this.groups = new HashMap<>();
     }
 
     public void mainMenu() {
@@ -22,7 +25,7 @@ public class UserInputHandler {
                 System.out.println("========= Main Menu =========");
                 System.out.println("What would you like to do?");
                 System.out.println("1. Create shape");
-                System.out.println("2. List current shapes");
+                System.out.println("2. List current shapes and groups");
                 System.out.println("3. Group shapes");
                 System.out.println("4. Move a shape, or a group");
                 System.out.println("5. Exit");
@@ -30,13 +33,17 @@ public class UserInputHandler {
 
                 switch (menuChoice) {
                     case 1:
-                        TwoDimensionalShape shape = askWhichShape();
+                        createShape();
+                        break;
                     case 2:
-                        // TODO: print current list of shapes
+                        printCurrentShapesAndGroups();
+                        break;
                     case 3:
-                        // TODO: group shapes and add group to list, remove them from shape list
+                        createGroup();
+                        break;
                     case 4:
-                        // TODO: ask for input on which shape or group to move
+                        moveShapeOrGroup();
+                        break;
                     case 5:
                         break;
                 }
@@ -51,7 +58,7 @@ public class UserInputHandler {
         }
     }
 
-    public TwoDimensionalShape askWhichShape() {
+    public void createShape() {
         try {
             System.out.println("What shape would you like to draw?");
             System.out.println("1: Rectangle");
@@ -66,8 +73,22 @@ public class UserInputHandler {
             System.out.println("Please provide the Y coordinate for your shape:");
             int startingY = Integer.parseInt(this.reader.readLine());
 
-            return handleChoice(shapeChoice, new int[]{startingX, startingY});
+            TwoDimensionalShape shape = handleChoice(shapeChoice, new int[]{startingX, startingY});
 
+            String shapeName = askForName();
+            this.shapes.put(shapeName, shape);
+            System.out.println("Shape '" + shapeName + "' created!");
+            System.out.println();
+
+        } catch (IOException ioe) {
+            System.out.println(ioe);
+        }
+    }
+
+    public String askForName() {
+        try {
+            System.out.println("Please provide the object's name:");
+            return this.reader.readLine();
         } catch (IOException ioe) {
             System.out.println(ioe);
         }
@@ -75,32 +96,133 @@ public class UserInputHandler {
         return null;
     }
 
-    public String askForShapeName() {
+    public void printCurrentShapesAndGroups() {
+        printShapes();
+        printGroups();
+    }
+
+    public void printShapes() {
+        if (this.shapes.size() < 1) {
+            System.out.println("There are currently no shapes.");
+            System.out.println();
+        } else {
+            for (var shape : this.shapes.entrySet()) {
+                System.out.println(shape.getKey());
+                shape.getValue().draw();
+                System.out.println();
+            }
+        }
+    }
+
+    public void printGroups() {
+        if (this.groups.size() < 1) {
+            System.out.println("There are currently no groups.");
+            System.out.println();
+        } else {
+            for (var group : this.groups.entrySet()) {
+                System.out.println(group.getKey());
+                group.getValue().draw();
+                System.out.println();
+            }
+        }
+    }
+
+    public void createGroup() {
         try {
-            System.out.println("What is the name of this shape?");
-            return this.reader.readLine();
+            System.out.println("Please provide a comma-separated list of the names of the shapes you want to group");
+            String commaSeparatedString = this.reader.readLine();
+            String[] shapeNames = commaSeparatedString.split(",");
+
+            TwoDimensionalShape[] shapes = new TwoDimensionalShape[shapeNames.length];
+
+            int i = 0;
+            for (String name : shapeNames) {
+                TwoDimensionalShape shapeToGroup = this.shapes.get(name);
+                shapes[i] = shapeToGroup;
+
+                this.shapes.remove(name);
+
+                i++;
+            }
+
+            String groupName = this.askForName();
+
+            GroupedShape group = new GroupedShape(shapes);
+            groups.put(groupName, group);
+
+            System.out.println("Created group: " + groupName);
 
         } catch (IOException ioe) {
             System.out.println(ioe);
         }
+    }
 
-        return null;
+    public void moveShapeOrGroup() {
+        try {
+            System.out.println("What would you like to move?");
+            System.out.println("1. Shape");
+            System.out.println("2. Group");
+            System.out.println();
+            int moveChoice = Integer.parseInt(this.reader.readLine());
+
+            switch (moveChoice) {
+                case 1 -> moveShape();
+                case 2 -> moveGroup();
+            }
+
+        } catch (IOException ioe) {
+            System.out.println(ioe);
+        }
+    }
+
+    public void moveShape() {
+        String shapeName = askForName();
+        TwoDimensionalShape shape = shapes.get(shapeName);
+        move(shape);
+    }
+
+    public void moveGroup() {
+        String groupName = askForName();
+        GroupedShape group = groups.get(groupName);
+        move(group);
+    }
+
+    public void move(TwoDimensionalShape shape) {
+        try {
+            System.out.println("Which direction would you like to move?");
+            System.out.println("1. Left");
+            System.out.println("2. Right");
+            System.out.println("3. Up");
+            System.out.println("4. Down");
+            System.out.println();
+            int directionChoice = Integer.parseInt(this.reader.readLine());
+
+            System.out.println("And by how many units would you like to move?");
+            int offsetChoice = Integer.parseInt(this.reader.readLine());
+
+            switch (directionChoice) {
+                case 1 -> shape.moveLeft(offsetChoice);
+                case 2 -> shape.moveRight(offsetChoice);
+                case 3 -> shape.moveUp(offsetChoice);
+                case 4 -> shape.moveDown(offsetChoice);
+            }
+
+            System.out.println("Consider it done!");
+            System.out.println();
+
+        } catch (IOException ioe) {
+            System.out.println(ioe);
+        }
     }
 
     private TwoDimensionalShape handleChoice(int shapeChoice, int[] startingCoordinates) {
         TwoDimensionalShape shape = null;
 
         switch (shapeChoice) {
-            case 1:
-                shape = handleRectangle(startingCoordinates);
-                break;
-            case 2:
-                shape = handleCircle(startingCoordinates);
-                break;
-            default:
-                // TODO: throw a shape not found exception?
+            case 1 -> shape = handleRectangle(startingCoordinates);
+            case 2 -> shape = handleCircle(startingCoordinates);
+            default -> {/*TODO: throw a shape not found exception?*/}
         }
-
 
         return shape;
     }

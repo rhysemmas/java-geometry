@@ -15,7 +15,7 @@ public class CircleTest {
         ArrayList<int[]> expectedCoordinates = new ArrayList<>();
         expectedCoordinates.add(new int[]{0, 0});
 
-        ArrayList<int[]> actualCoordinates = circle.draw();
+        ArrayList<int[]> actualCoordinates = circle.getCoordinates();
 
         assertArrayEquals(expectedCoordinates.toArray(), actualCoordinates.toArray());
     }
@@ -28,7 +28,7 @@ public class CircleTest {
         expectedCoordinates.add(new int[]{-1, 0});
 
         circle.moveLeft(1);
-        ArrayList<int[]> actualCoordinates = circle.draw();
+        ArrayList<int[]> actualCoordinates = circle.getCoordinates();
 
         assertArrayEquals(expectedCoordinates.toArray(), actualCoordinates.toArray());
     }
