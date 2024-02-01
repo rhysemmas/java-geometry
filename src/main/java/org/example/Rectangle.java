@@ -26,7 +26,7 @@ public class Rectangle extends TwoDimensionalShape {
         }
     }
 
-    private ArrayList<int[]> calculateCoordinates() {
+    public ArrayList<int[]> calculateCoordinates() {
         int[] bottomRightCorner = new int[]{this.startingCoordinates[0] + length, this.startingCoordinates[1]};
         int[] topLeftCorner = new int[]{this.startingCoordinates[0], this.startingCoordinates[1] + width};
         int[] topRightCorner = new int[]{this.startingCoordinates[0] + length, this.startingCoordinates[1] + width};

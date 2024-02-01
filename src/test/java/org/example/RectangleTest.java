@@ -18,7 +18,7 @@ public class RectangleTest {
         expectedCoordinates.add(new int[]{0, 3});
         expectedCoordinates.add(new int[]{5, 3});
 
-        ArrayList<int[]> actualCoordinates = rectangle.getCoordinates();
+        ArrayList<int[]> actualCoordinates = rectangle.calculateCoordinates();
 
         assertArrayEquals(expectedCoordinates.toArray(), actualCoordinates.toArray());
     }
@@ -34,7 +34,7 @@ public class RectangleTest {
         expectedCoordinates.add(new int[]{4, 3});
 
         rectangle.moveLeft(1);
-        ArrayList<int[]> actualCoordinates = rectangle.getCoordinates();
+        ArrayList<int[]> actualCoordinates = rectangle.calculateCoordinates();
 
         assertArrayEquals(expectedCoordinates.toArray(), actualCoordinates.toArray());
     }
