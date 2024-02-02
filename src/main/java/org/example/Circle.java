@@ -1,15 +1,10 @@
 package org.example;
 
-public class Circle extends TwoDimensionalShape {
+public class Circle extends Point {
     private final int radius;
 
-    public Circle(int[] centre, int radius) {
-        this.startingCoordinates = centre;
-        this.radius = radius;
-    }
-
-    public Circle(int radius) {
-        this.startingCoordinates = new int[]{0, 0};
+    public Circle(int x, int y, int radius) {
+        this.coordinate = new double[]{x, y};
         this.radius = radius;
     }
 

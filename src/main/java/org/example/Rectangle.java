@@ -1,42 +1,35 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Rectangle extends TwoDimensionalShape {
+public class Rectangle extends Point {
     private final int length;
     private final int width;
 
 
-    public Rectangle(int[] bottomLeftCorner, int length, int width) {
-        this.startingCoordinates = bottomLeftCorner;
+    public Rectangle(int bottomLeftX, int bottomLeftY, int length, int width) {
+        this.coordinate = new double[]{bottomLeftX, bottomLeftY};
         this.length = length;
         this.width = width;
     }
 
-    public Rectangle(int length, int width) {
-        this.startingCoordinates = new int[]{0, 0};
-        this.length = length;
-        this.width = width;
+    @Override
+    public List<double[]> draw() {
+        return this.calculateCorners();
     }
 
-    public void draw() {
-        ArrayList<int[]> coordinates = this.calculateCoordinates();
-        for (int[] c : coordinates) {
-            System.out.println(c[0] + ", " + c[1]);
-        }
-    }
+    private List<double[]> calculateCorners() {
+        double[] bottomRightCorner = new double[]{this.coordinate[0] + length, this.coordinate[1]};
+        double[] topLeftCorner = new double[]{this.coordinate[0], this.coordinate[1] + width};
+        double[] topRightCorner = new double[]{this.coordinate[0] + length, this.coordinate[1] + width};
 
-    public ArrayList<int[]> calculateCoordinates() {
-        int[] bottomRightCorner = new int[]{this.startingCoordinates[0] + length, this.startingCoordinates[1]};
-        int[] topLeftCorner = new int[]{this.startingCoordinates[0], this.startingCoordinates[1] + width};
-        int[] topRightCorner = new int[]{this.startingCoordinates[0] + length, this.startingCoordinates[1] + width};
+        ArrayList<double[]> corners = new ArrayList<>();
+        corners.add(this.coordinate);
+        corners.add(bottomRightCorner);
+        corners.add(topLeftCorner);
+        corners.add(topRightCorner);
 
-        ArrayList<int[]> coordinates = new ArrayList<>();
-        coordinates.add(this.startingCoordinates);
-        coordinates.add(bottomRightCorner);
-        coordinates.add(topLeftCorner);
-        coordinates.add(topRightCorner);
-
-        return coordinates;
+        return corners;
     }
 }

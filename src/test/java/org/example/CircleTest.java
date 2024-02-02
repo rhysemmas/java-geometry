@@ -3,17 +3,18 @@ package org.example;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class CircleTest {
     @Test
     @DisplayName("Circle draws correctly")
-    void testCircleMovesLeft() {
-        Circle circle = new Circle(3);
-        int[] expectedCoordinates = new int[]{-1, 0};
+    void testCircleDraws() {
+        Circle circle = new Circle(0, 0, 1);
+        ArrayList<double[]> expectedCoordinates = new ArrayList<>();
+        expectedCoordinates.add(new double[]{0, 0});
 
-        circle.moveLeft(1);
-
-        assertArrayEquals(expectedCoordinates, circle.startingCoordinates);
+        assertArrayEquals(expectedCoordinates.toArray(), circle.draw().toArray());
     }
 }

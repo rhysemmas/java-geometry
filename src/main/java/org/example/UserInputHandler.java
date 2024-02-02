@@ -3,20 +3,19 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // TODO: consider whether we need an extra layer of abstraction between this input handling class and the shapes.
 // Maybe something like a ShapeFactory? Would need to look into exactly how to implement the pattern, but right now
 // it feels weird having the thing that just handles input also be responsible for creating and managing the shapes.
 public class UserInputHandler {
     private final BufferedReader reader;
-    private final HashMap<String, TwoDimensionalShape> shapes;
-    private final HashMap<String, GroupedShape> groups;
+    private final ShapeController controller;
 
     UserInputHandler() {
         this.reader = new BufferedReader(new InputStreamReader(System.in));
-        this.shapes = new HashMap<>();
-        this.groups = new HashMap<>();
+        this.controller = new ShapeController();
     }
 
     public void mainMenu() {
@@ -67,6 +66,7 @@ public class UserInputHandler {
             int shapeChoice = Integer.parseInt(this.reader.readLine());
 
             System.out.println("I was hoping you'd choose the other one...");
+            System.out.println();
 
             System.out.println("Please provide the X coordinate for your shape:");
             int startingX = Integer.parseInt(this.reader.readLine());
@@ -74,10 +74,11 @@ public class UserInputHandler {
             System.out.println("Please provide the Y coordinate for your shape:");
             int startingY = Integer.parseInt(this.reader.readLine());
 
-            TwoDimensionalShape shape = handleChoice(shapeChoice, new int[]{startingX, startingY});
+            Movable shape = handleChoice(shapeChoice, new int[]{startingX, startingY});
 
             String shapeName = askForName();
-            this.shapes.put(shapeName, shape);
+            this.controller.addShape(shapeName, shape);
+
             System.out.println("Shape '" + shapeName + "' created!");
             System.out.println();
 
@@ -98,33 +99,41 @@ public class UserInputHandler {
     }
 
     public void printCurrentShapesAndGroups() {
-        printShapes();
+        printShapes(this.controller.listShapes());
         printGroups();
     }
 
-    public void printShapes() {
-        if (this.shapes.size() < 1) {
+    public void printShapes(Map<String, Movable> shapes) {
+        if (shapes.isEmpty()) {
             System.out.println("There are currently no shapes.");
             System.out.println();
         } else {
-            for (var shape : this.shapes.entrySet()) {
-                System.out.println(shape.getKey());
-                shape.getValue().draw();
+            for (String shapeName : shapes.keySet()) {
+                System.out.println(shapeName);
+                this.printCoordinates(shapes.get(shapeName).draw());
                 System.out.println();
             }
         }
     }
 
     public void printGroups() {
-        if (this.groups.size() < 1) {
+        Map<String, Map<String, Movable>> groups = this.controller.listGroups();
+
+        if (groups.isEmpty()) {
             System.out.println("There are currently no groups.");
             System.out.println();
         } else {
-            for (var group : this.groups.entrySet()) {
-                System.out.println(group.getKey());
-                group.getValue().draw();
+            for (var groupName : groups.keySet()) {
+                System.out.println(groupName);
+                this.printShapes(groups.get(groupName));
                 System.out.println();
             }
+        }
+    }
+
+    public void printCoordinates(List<double[]> coordinates) {
+        for (double[] coordinate : coordinates) {
+            System.out.println("X: " + coordinate[0] + ", " + "Y: " + coordinate[1]);
         }
     }
 
@@ -132,26 +141,14 @@ public class UserInputHandler {
         try {
             System.out.println("Please provide a comma-separated list of the names of the shapes you want to group");
             String commaSeparatedString = this.reader.readLine();
+
             String[] shapeNames = commaSeparatedString.split(",");
-
-            TwoDimensionalShape[] shapes = new TwoDimensionalShape[shapeNames.length];
-
-            int i = 0;
-            for (String name : shapeNames) {
-                TwoDimensionalShape shapeToGroup = this.shapes.get(name);
-                shapes[i] = shapeToGroup;
-
-                this.shapes.remove(name);
-
-                i++;
-            }
-
             String groupName = this.askForName();
 
-            GroupedShape group = new GroupedShape(shapes);
-            groups.put(groupName, group);
+            this.controller.createGroup(groupName, shapeNames);
 
             System.out.println("Created group: " + groupName);
+            System.out.println();
 
         } catch (IOException ioe) {
             System.out.println(ioe);
@@ -163,7 +160,6 @@ public class UserInputHandler {
             System.out.println("What would you like to move?");
             System.out.println("1. Shape");
             System.out.println("2. Group");
-            System.out.println();
             int moveChoice = Integer.parseInt(this.reader.readLine());
 
             switch (moveChoice) {
@@ -171,6 +167,8 @@ public class UserInputHandler {
                 case 2 -> moveGroup();
             }
 
+            System.out.println("Consider it done!");
+            System.out.println();
         } catch (IOException ioe) {
             System.out.println(ioe);
         }
@@ -178,46 +176,44 @@ public class UserInputHandler {
 
     public void moveShape() {
         String shapeName = askForName();
-        TwoDimensionalShape shape = shapes.get(shapeName);
-        move(shape);
+        int[] coordinates = askWhereToMove();
+        try {
+            this.controller.moveShape(shapeName, coordinates[0], coordinates[1]);
+        } catch (IllegalArgumentException iae) {
+            System.out.println(iae);
+        }
     }
 
     public void moveGroup() {
         String groupName = askForName();
-        GroupedShape group = groups.get(groupName);
-        move(group);
+        int[] coordinates = askWhereToMove();
+        try {
+            this.controller.moveGroup(groupName, coordinates[0], coordinates[1]);
+        } catch (IllegalArgumentException iae) {
+            System.out.println(iae);
+        }
     }
 
-    public void move(TwoDimensionalShape shape) {
+    public int[] askWhereToMove() {
         try {
-            System.out.println("Which direction would you like to move?");
-            System.out.println("1. Left");
-            System.out.println("2. Right");
-            System.out.println("3. Up");
-            System.out.println("4. Down");
-            System.out.println();
-            int directionChoice = Integer.parseInt(this.reader.readLine());
+            System.out.println("Where would you like to move to?");
+            String commaSeparatedString = this.reader.readLine();
 
-            System.out.println("And by how many units would you like to move?");
-            int offsetChoice = Integer.parseInt(this.reader.readLine());
+            String[] coordinates = commaSeparatedString.split(",");
+            int x = Integer.parseInt(coordinates[0]);
+            int y = Integer.parseInt(coordinates[1]);
 
-            switch (directionChoice) {
-                case 1 -> shape.moveLeft(offsetChoice);
-                case 2 -> shape.moveRight(offsetChoice);
-                case 3 -> shape.moveUp(offsetChoice);
-                case 4 -> shape.moveDown(offsetChoice);
-            }
-
-            System.out.println("Consider it done!");
-            System.out.println();
+            return new int[]{x, y};
 
         } catch (IOException ioe) {
             System.out.println(ioe);
         }
+
+        return null;
     }
 
-    private TwoDimensionalShape handleChoice(int shapeChoice, int[] startingCoordinates) {
-        TwoDimensionalShape shape = null;
+    private Movable handleChoice(int shapeChoice, int[] startingCoordinates) {
+        Movable shape = null;
 
         switch (shapeChoice) {
             case 1 -> shape = handleRectangle(startingCoordinates);
@@ -228,7 +224,7 @@ public class UserInputHandler {
         return shape;
     }
 
-    private TwoDimensionalShape handleRectangle(int[] coordinates) {
+    private Movable handleRectangle(int[] coordinates) {
         try {
             System.out.println("Please provide the length for your rectangle:");
             int length = Integer.parseInt(this.reader.readLine());
@@ -236,7 +232,7 @@ public class UserInputHandler {
             System.out.println("Please provide the width for your rectangle:");
             int width = Integer.parseInt(this.reader.readLine());
 
-            return new Rectangle(coordinates, length, width);
+            return new Rectangle(coordinates[0], coordinates[1], length, width);
         } catch (IOException ioe) {
             System.out.println(ioe);
         }
@@ -244,12 +240,12 @@ public class UserInputHandler {
         return null;
     }
 
-    private TwoDimensionalShape handleCircle(int[] coordinates) {
+    private Movable handleCircle(int[] coordinates) {
         try {
             System.out.println("Please provide the radius for your circle:");
             int radius = Integer.parseInt(this.reader.readLine());
 
-            return new Circle(coordinates, radius);
+            return new Circle(coordinates[0], coordinates[1], radius);
         } catch (IOException ioe) {
             System.out.println(ioe);
         }
