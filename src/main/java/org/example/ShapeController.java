@@ -23,13 +23,13 @@ public class ShapeController {
     public Movable getShape(String name) throws IllegalArgumentException {
         Movable shape = this.shapes.get(name);
         if (shape == null) {
-            throw new IllegalArgumentException("Shape '" + name + "' " + "does not exist!");
+            throw new IllegalArgumentException("Shape '" + name + "' does not exist!");
         }
 
         return shape;
     }
 
-    /* TODO: could consider if user tries to move a shape which is part of a group, the entire group moves 
+    /* TODO: could consider if user tries to move a shape which is part of a group, the entire group moves
         (rather than them having to address the group directly) */
     public void moveShape(String name, int x, int y) throws IllegalArgumentException {
         try {
