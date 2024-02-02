@@ -53,6 +53,7 @@ public class UserInputHandler {
                 }
 
             } catch (IOException ioe) {
+                // TODO: throw exception?
                 System.out.println(ioe);
             }
         }
@@ -237,7 +238,6 @@ public class UserInputHandler {
 
             return new Rectangle(coordinates, length, width);
         } catch (IOException ioe) {
-            // TODO: throw exception?
             System.out.println(ioe);
         }
 
@@ -251,7 +251,6 @@ public class UserInputHandler {
 
             return new Circle(coordinates, radius);
         } catch (IOException ioe) {
-            // TODO: throw exception?
             System.out.println(ioe);
         }
 

@@ -16,5 +16,4 @@ public class CircleTest {
 
         assertArrayEquals(expectedCoordinates, circle.startingCoordinates);
     }
-
 }
