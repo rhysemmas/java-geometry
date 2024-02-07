@@ -1,35 +1,31 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Rectangle extends Point {
+public class Rectangle implements Shape {
     private final int length;
     private final int width;
+    private final Movable centerPoint;
 
-
-    public Rectangle(int bottomLeftX, int bottomLeftY, int length, int width) {
-        this.coordinate = new double[]{bottomLeftX, bottomLeftY};
+    public Rectangle(Movable centerPoint, int length, int width) {
         this.length = length;
         this.width = width;
+        this.centerPoint = centerPoint;
     }
 
-    @Override
-    public List<double[]> draw() {
+    public Movable[] getCorners() {
         return this.calculateCorners();
     }
 
-    private List<double[]> calculateCorners() {
-        double[] bottomRightCorner = new double[]{this.coordinate[0] + length, this.coordinate[1]};
-        double[] topLeftCorner = new double[]{this.coordinate[0], this.coordinate[1] + width};
-        double[] topRightCorner = new double[]{this.coordinate[0] + length, this.coordinate[1] + width};
+    public Movable getCenter() {
+        return this.centerPoint;
+    }
 
-        ArrayList<double[]> corners = new ArrayList<>();
-        corners.add(this.coordinate);
-        corners.add(bottomRightCorner);
-        corners.add(topLeftCorner);
-        corners.add(topRightCorner);
+    private Movable[] calculateCorners() {
+        double[] centerCoordinate = this.centerPoint.getPosition();
+        Movable bottomLeftCorner = new Point((centerCoordinate[0] - ((double) this.length / 2)), (centerCoordinate[1] - ((double) this.width / 2)));
+        Movable bottomRightCorner = new Point((centerCoordinate[0] + ((double) this.length / 2)), (centerCoordinate[1] - ((double) this.width / 2)));
+        Movable topLeftCorner = new Point((centerCoordinate[0] - ((double) this.length / 2)), (centerCoordinate[1] + ((double) this.width / 2)));
+        Movable topRightCorner = new Point((centerCoordinate[0] + ((double) this.length / 2)), (centerCoordinate[1] + ((double) this.width / 2)));
 
-        return corners;
+        return new Movable[]{bottomLeftCorner, bottomRightCorner, topLeftCorner, topRightCorner};
     }
 }

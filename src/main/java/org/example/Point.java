@@ -1,25 +1,17 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Point implements Movable {
-    public double[] coordinate;
+    private double[] coordinate;
 
-    public Point() {
+    public Point(double x, double y) {
+        this.move(x, y);
     }
 
     public void move(double x, double y) {
         this.coordinate = new double[]{x, y};
     }
 
-    public double[] getPoint() {
+    public double[] getPosition() {
         return this.coordinate;
-    }
-
-    public List<double[]> draw() {
-        ArrayList<double[]> position = new ArrayList<>();
-        position.add(this.coordinate);
-        return position;
     }
 }

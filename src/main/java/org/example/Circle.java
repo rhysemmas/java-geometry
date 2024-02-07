@@ -1,14 +1,19 @@
 package org.example;
 
-public class Circle extends Point {
+public class Circle implements Shape {
     private final int radius;
+    private final Movable center;
 
-    public Circle(int x, int y, int radius) {
-        this.coordinate = new double[]{x, y};
+    public Circle(Movable center, int radius) {
         this.radius = radius;
+        this.center = center;
     }
 
-    public double area() {
-        return Math.PI * (radius * radius);
+    public Movable[] getCorners() throws HasNoCornersException {
+        throw new HasNoCornersException("Circle has no corners");
+    }
+
+    public Movable getCenter() {
+        return this.center;
     }
 }

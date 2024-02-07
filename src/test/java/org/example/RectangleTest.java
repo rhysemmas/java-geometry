@@ -6,33 +6,41 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RectangleTest {
-    @Test
-    @DisplayName("Rectangle draws correctly")
-    void testRectangleDraws() {
-        Rectangle rectangle = new Rectangle(0, 0, 5, 3);
-        ArrayList<double[]> expectedCoordinates = new ArrayList<>();
-        expectedCoordinates.add(new double[]{0, 0});
-        expectedCoordinates.add(new double[]{5, 0});
-        expectedCoordinates.add(new double[]{0, 3});
-        expectedCoordinates.add(new double[]{5, 3});
+    private final Movable defaultCenterPoint = new Point(0, 0);
 
-        assertArrayEquals(expectedCoordinates.toArray(), rectangle.draw().toArray());
+    @Test
+    @DisplayName("Rectangle has correct center point")
+    void testRectangleHasCorrectCenter() {
+        Rectangle rectangle = new Rectangle(this.defaultCenterPoint, 2, 1);
+
+        assertEquals(this.defaultCenterPoint, rectangle.getCenter());
     }
 
     @Test
-    @DisplayName("Rectangle moves left correctly")
-    void testRectangleMovesLeft() {
-        Rectangle rectangle = new Rectangle(0, 0, 5, 3);
-        ArrayList<double[]> expectedCoordinates = new ArrayList<>();
-        expectedCoordinates.add(new double[]{-1, 0});
-        expectedCoordinates.add(new double[]{4, 0});
-        expectedCoordinates.add(new double[]{-1, 3});
-        expectedCoordinates.add(new double[]{4, 3});
+    @DisplayName("Rectangle has correct corners")
+    void testRectangleHasCorrectCorners() {
+        Rectangle rectangle = new Rectangle(this.defaultCenterPoint, 10, 6);
 
-        rectangle.move(-1, 0);
+        Movable bottomLeftCorner = new Point(-5, -3);
+        Movable bottomRightCorner = new Point(5, -3);
+        Movable topLeftCorner = new Point(-5, 3);
+        Movable topRightCorner = new Point(5, 3);
 
-        assertArrayEquals(expectedCoordinates.toArray(), rectangle.draw().toArray());
+        ArrayList<double[]> expectedCorners = new ArrayList<>();
+        expectedCorners.add(bottomLeftCorner.getPosition());
+        expectedCorners.add(bottomRightCorner.getPosition());
+        expectedCorners.add(topLeftCorner.getPosition());
+        expectedCorners.add(topRightCorner.getPosition());
+
+        ArrayList<double[]> actualCorners = new ArrayList<>();
+        Movable[] rectangleCorners = rectangle.getCorners();
+        for (Movable corner : rectangleCorners) {
+            actualCorners.add(corner.getPosition());
+        }
+
+        assertArrayEquals(expectedCorners.toArray(), actualCorners.toArray());
     }
 }
