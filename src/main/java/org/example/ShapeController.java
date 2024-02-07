@@ -79,11 +79,11 @@ public class ShapeController {
     }
 
     public Map<String, Shape> getGroup(String name) throws IllegalArgumentException {
-        try {
-            return this.groups.get(name);
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException(exception);
+        Map<String, Shape> group = this.groups.get(name);
+        if (group == null) {
+            throw new IllegalArgumentException("Group '" + name + "' does not exist!");
         }
+        return group;
     }
 
     public void moveGroup(String name, int x, int y) throws IllegalArgumentException {
